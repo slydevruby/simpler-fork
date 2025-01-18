@@ -1,12 +1,16 @@
+# frozen_string_literal: true
+
 require 'yaml'
 require 'singleton'
 require 'sequel'
 require_relative 'router'
+require_relative 'logger'
 require_relative 'controller'
 
+# Simpler implementation
 module Simpler
+  # Application
   class Application
-
     include Singleton
 
     attr_reader :db
@@ -22,26 +26,23 @@ module Simpler
       require_routes
     end
 
+    def call(env)
+      route = @router.route_for(env)
+      if route
+        make_response(route.controller.new(env), route.action)
+      else
+        [404, { 'content-type' => 'text/plain' }, ["not found\n"]]
+      end
+    end
+
     def routes(&block)
       @router.instance_eval(&block)
     end
 
-    def call(env)
-      route = @router.route_for(env)
-      controller = route.controller.new(env)
-      action = route.action
-
-      make_response(controller, action)
-    end
-
     private
 
-    def require_app
-      Dir["#{Simpler.root}/app/**/*.rb"].each { |file| require file }
-    end
-
-    def require_routes
-      require Simpler.root.join('config/routes')
+    def make_response(controller, action)
+      controller.make_response(action)
     end
 
     def setup_database
@@ -50,9 +51,12 @@ module Simpler
       @db = Sequel.connect(database_config)
     end
 
-    def make_response(controller, action)
-      controller.make_response(action)
+    def require_app
+      Dir["#{Simpler.root}/app/**/*.rb"].each { |file| require file }
     end
 
+    def require_routes
+      require Simpler.root.join('config/routes')
+    end
   end
 end

@@ -1,2 +1,3 @@
+---
 adapter: sqlite
 database: db/test_guru.sqlite

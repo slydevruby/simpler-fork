@@ -1,54 +1,88 @@
-require_relative 'view'
+# frozen_string_literal: true
+
+require 'rack/response'
 
 module Simpler
+  # Controller
   class Controller
+    STATUS = { ok: 200, not_found: 404 }.freeze
 
-    attr_reader :name, :request, :response
+    attr_reader :name, :params
 
     def initialize(env)
       @name = extract_name
+      @params = {}
       @request = Rack::Request.new(env)
       @response = Rack::Response.new
+      status(:ok)
     end
 
     def make_response(action)
       @request.env['simpler.controller'] = self
       @request.env['simpler.action'] = action
 
-      set_default_headers
+      extract_params
       send(action)
+      text_header('html')
       write_response
-
+      write_log
       @response.finish
     end
 
     private
 
+    def fetch_env(key)
+      @request.env.fetch(key)
+    end
+
+    def write_log
+      Logger.info("Request #{fetch_env('REQUEST_METHOD')} #{fetch_env('REQUEST_URI')}")
+      action = fetch_env('simpler.action')
+      Logger.info("Handler #{self.class.name}##{action}")
+      Logger.info("Response #{@response.status} [#{@response.content_type}] #{@name}/#{action}.html.erb")
+    end
+
+    def status(value)
+      @response.status = STATUS[value]
+    end
+
+    def render(template)
+      if template.instance_of?(::Hash)
+        method_and_template(template.keys[0].to_s, template.values[0])
+      else
+        method_and_template('html', template)
+      end
+    end
+
+    def method_and_template(method, template)
+      @request.env['simpler.method'] = method
+      @request.env['simpler.template'] = template
+      text_header(method)
+    end
+
     def extract_name
       self.class.name.match('(?<name>.+)Controller')[:name].downcase
     end
 
-    def set_default_headers
-      @response['Content-Type'] = 'text/html'
+    def extract_params
+      # p1 = 'localhost:9292/tests/101'.match('/(?<id>\d+).*')[:id]
+      # puts '-' * 30 , p1
+      # @params[:id] = p1
+      p @request
+      puts @request.params
+    end
+
+    def text_header(header)
+      @response['Content-Type'] = "text/#{header}"
     end
 
     def write_response
       body = render_body
-
       @response.write(body)
     end
 
     def render_body
       View.new(@request.env).render(binding)
     end
-
-    def params
-      @request.params
-    end
-
-    def render(template)
-      @request.env['simpler.template'] = template
-    end
-
   end
 end
