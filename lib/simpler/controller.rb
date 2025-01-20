@@ -7,11 +7,10 @@ module Simpler
   class Controller
     STATUS = { ok: 200, not_found: 404 }.freeze
 
-    attr_reader :name, :params
+    attr_reader :name
 
     def initialize(env)
       @name = extract_name
-      @params = {}
       @request = Rack::Request.new(env)
       @response = Rack::Response.new
       status(:ok)
@@ -21,12 +20,15 @@ module Simpler
       @request.env['simpler.controller'] = self
       @request.env['simpler.action'] = action
 
-      extract_params
       send(action)
       text_header('html')
       write_response
       write_log
       @response.finish
+    end
+
+    def params
+      @request.params
     end
 
     private
@@ -62,14 +64,6 @@ module Simpler
 
     def extract_name
       self.class.name.match('(?<name>.+)Controller')[:name].downcase
-    end
-
-    def extract_params
-      # p1 = 'localhost:9292/tests/101'.match('/(?<id>\d+).*')[:id]
-      # puts '-' * 30 , p1
-      # @params[:id] = p1
-      p @request
-      puts @request.params
     end
 
     def text_header(header)

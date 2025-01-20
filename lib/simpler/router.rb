@@ -10,7 +10,6 @@ module Simpler
     end
 
     def get(path, route_point)
-      puts("get path:#{path}, route_point:#{route_point}")
       add_route(:get, path, route_point)
     end
 
@@ -21,17 +20,28 @@ module Simpler
     def route_for(env)
       method = env.fetch('REQUEST_METHOD').downcase.to_sym
       path = env.fetch('PATH_INFO')
-      puts("Router.route_for path #{path}")
       @routes.find { |route| route.match?(method, path) }
     end
 
     private
 
+    def parse_arguments(args)
+      args.map do |x|
+        if /^:/ =~ x
+          { x => :dynamic }
+        else
+          { x => :static }
+        end
+      end
+    end
+
     def add_route(method, path, route_point)
+      args = path.gsub(%r{/[:\w]*}).to_a.map { |x| x.delete('/') }[1..]
+      args = parse_arguments(args)
+
       ctrl, action = route_point.split('#')
-      puts("Router.add_route action #{action}")
       controller = controller_from_string(ctrl)
-      route = Route.new(method, path, controller, action)
+      route = Route.new(method, path, controller, action, args)
       @routes.push(route)
     end
 
