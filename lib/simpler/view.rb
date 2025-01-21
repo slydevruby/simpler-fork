@@ -3,9 +3,7 @@
 require 'erb'
 require 'cgi'
 
-# some comment
 module Simpler
-  # class View
   class View
     VIEW_BASE_PATH = 'app/views'
 

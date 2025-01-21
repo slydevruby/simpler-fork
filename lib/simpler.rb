@@ -4,7 +4,6 @@ require_relative 'simpler/application'
 require_relative 'simpler/controller'
 require_relative 'simpler/view'
 
-# Simpler framework
 module Simpler
   class << self
     def application

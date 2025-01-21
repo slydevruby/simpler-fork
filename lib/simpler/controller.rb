@@ -3,7 +3,6 @@
 require 'rack/response'
 
 module Simpler
-  # Controller
   class Controller
     STATUS = { ok: 200, not_found: 404 }.freeze
 
@@ -21,7 +20,7 @@ module Simpler
       @request.env['simpler.action'] = action
 
       send(action)
-      text_header('html')
+      set_content_type('text', 'html')
       write_response
       write_log
       @response.finish
@@ -59,15 +58,15 @@ module Simpler
     def method_and_template(method, template)
       @request.env['simpler.method'] = method
       @request.env['simpler.template'] = template
-      text_header(method)
+      set_content_type('text', method)
     end
 
     def extract_name
       self.class.name.match('(?<name>.+)Controller')[:name].downcase
     end
 
-    def text_header(header)
-      @response['Content-Type'] = "text/#{header}"
+    def set_content_type(content, type)
+      @response['Content-Type'] = "#{content}/#{type}"
     end
 
     def write_response

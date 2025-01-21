@@ -3,7 +3,6 @@
 require_relative 'router/route'
 
 module Simpler
-  # Router
   class Router
     def initialize
       @routes = []
@@ -25,7 +24,8 @@ module Simpler
 
     private
 
-    def parse_arguments(args)
+    def parse_arguments_from(path)
+      args = path.gsub(%r{/[:\w]*}).to_a.map { |x| x.delete('/') }[1..]
       args.map do |x|
         if /^:/ =~ x
           { x => :dynamic }
@@ -36,8 +36,7 @@ module Simpler
     end
 
     def add_route(method, path, route_point)
-      args = path.gsub(%r{/[:\w]*}).to_a.map { |x| x.delete('/') }[1..]
-      args = parse_arguments(args)
+      args = parse_arguments_from(path)
 
       ctrl, action = route_point.split('#')
       controller = controller_from_string(ctrl)

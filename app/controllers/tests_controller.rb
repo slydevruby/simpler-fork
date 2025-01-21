@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
-# Controller
 class TestsController < Simpler::Controller
   def plain
-    # @time = Time.now
-    # @tests = Test.all
     render plain: 'plain response'
   end
 
   def list
+    @tests = Test.all
     render 'tests/list'
   end
 

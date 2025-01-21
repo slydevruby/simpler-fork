@@ -2,7 +2,6 @@
 
 # Namespace
 module Simpler
-  # Custom Logger
   module Logger
     @@log = File.open('log/app.log', 'a+')
 

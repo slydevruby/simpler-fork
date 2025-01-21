@@ -7,9 +7,7 @@ require_relative 'router'
 require_relative 'logger'
 require_relative 'controller'
 
-# Simpler implementation
 module Simpler
-  # Application
   class Application
     include Singleton
 

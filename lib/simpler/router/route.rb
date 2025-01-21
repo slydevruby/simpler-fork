@@ -2,9 +2,7 @@
 
 # Simpler
 module Simpler
-  # Router
   class Router
-    # Route
     class Route
       attr_reader :controller, :action, :args
 
@@ -13,10 +11,12 @@ module Simpler
         @path = path
         @controller = controller
         @action = action
+        puts "Route new method: #{method}, path: #{path}, action: #{action}, args #{args}"
         @args = args
       end
 
       def match?(method, path)
+        puts "match? #{method} #{path} @path: #{@path}"
         @method == method && path.match(@path)
       end
     end
