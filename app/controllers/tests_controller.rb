@@ -18,6 +18,8 @@ class TestsController < Simpler::Controller
   end
 
   def foobar
+    @foo = params[:foo]
+    @bar = params[:bar]
     render 'tests/foobar'
   end
 end
