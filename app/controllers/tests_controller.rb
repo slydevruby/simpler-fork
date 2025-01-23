@@ -13,7 +13,11 @@ class TestsController < Simpler::Controller
   def create; end
 
   def show
-    # @foo = params[:id]
+    @foo = params[:id]
     render 'tests/show'
+  end
+
+  def foobar
+    render 'tests/foobar'
   end
 end

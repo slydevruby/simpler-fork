@@ -24,23 +24,10 @@ module Simpler
 
     private
 
-    def parse_arguments_from(path)
-      args = path.gsub(%r{/[:\w]*}).to_a.map { |x| x.delete('/') }[1..]
-      args.map do |x|
-        if /^:/ =~ x
-          { x => :dynamic }
-        else
-          { x => :static }
-        end
-      end
-    end
-
     def add_route(method, path, route_point)
-      args = parse_arguments_from(path)
-
       ctrl, action = route_point.split('#')
       controller = controller_from_string(ctrl)
-      route = Route.new(method, path, controller, action, args)
+      route = Route.new(method, path, controller, action)
       @routes.push(route)
     end
 

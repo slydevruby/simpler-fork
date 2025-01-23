@@ -15,9 +15,10 @@ module Simpler
       status(:ok)
     end
 
-    def make_response(action)
+    def make_response(action, params)
       @request.env['simpler.controller'] = self
       @request.env['simpler.action'] = action
+      @request.params.update(params)
 
       send(action)
       set_content_type('text', 'html')
@@ -39,6 +40,7 @@ module Simpler
     def write_log
       Logger.info("Request #{fetch_env('REQUEST_METHOD')} #{fetch_env('REQUEST_URI')}")
       action = fetch_env('simpler.action')
+      Logger.info("Parameters: #{params}")
       Logger.info("Handler #{self.class.name}##{action}")
       Logger.info("Response #{@response.status} [#{@response.content_type}] #{@name}/#{action}.html.erb")
     end

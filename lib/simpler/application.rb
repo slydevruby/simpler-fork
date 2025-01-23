@@ -27,7 +27,7 @@ module Simpler
     def call(env)
       route = @router.route_for(env)
       if route
-        make_response(route.controller.new(env), route.action)
+        make_response(route.controller.new(env), route.action, route.params)
       else
         [404, { 'content-type' => 'text/plain' }, ["not found\n"]]
       end
@@ -39,8 +39,8 @@ module Simpler
 
     private
 
-    def make_response(controller, action)
-      controller.make_response(action)
+    def make_response(controller, action, params)
+      controller.make_response(action, params)
     end
 
     def setup_database
