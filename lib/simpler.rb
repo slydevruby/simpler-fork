@@ -1,8 +1,10 @@
-require 'pathname'
+# frozen_string_literal: true
+
 require_relative 'simpler/application'
+require_relative 'simpler/controller'
+require_relative 'simpler/view'
 
 module Simpler
-
   class << self
     def application
       Application.instance
@@ -12,5 +14,4 @@ module Simpler
       Pathname.new(File.expand_path('..', __dir__))
     end
   end
-
 end
